@@ -1,3 +1,4 @@
+import time
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -9,6 +10,7 @@ from selenium.webdriver.common.by import By
 
 # * This script goes through SalesNav Inbox and adds connections to the CRM that are not already in the database
 print("Running Send To CVS Card\n")
+# CVS URL https://www.cvs.com/extracare/home
 
 # *
 # * Start the LinkedIn Profile page scrapping
@@ -42,9 +44,25 @@ except BaseException as ex:
 
 # * Make Sure its the right CVS Page
 try:
-    browser.find_element(By.XPATH,"span[@class='sc-send-to-card-action']")
+    browser.find_element(By.XPATH,"//h1[contains(@id,'extracareHeading')]")
+    # browser.find_element(By.XPATH,"//span[contains(@class,'sc-send-to-card-action')]")
     print("Found correct CVS Page")
+    print ("Scrolling to end of page to load all Send To Card Elements")
+    browser.execute_script("var scrollingElement = (document.scrollingElement || document.body);scrollingElement.scrollTop = scrollingElement.scrollHeight;")
+    time.sleep(1)
     print("Working on parsing Add To Cards")
+    # print("Coupons",len(browser.find_elements(By.XPATH,"//span[text()='Send to card']")))
+    # if (browser.find_element(By.XPATH,"//span[text()='Send to card']")):
+    try: 
+        while (browser.find_element(By.XPATH,"//span[text()='Send to card']")):   
+            print("Coupons",len(browser.find_elements(By.XPATH,"//span[text()='Send to card']")))
+            sendToCard = browser.find_element(By.XPATH,"//span[text()='Send to card']")
+            sendToCard.click()
+            time.sleep(0.5) # half a second
+    except NoSuchElementException as ex:
+        print ("No more send to card elements found. All Done!")
+        exit()
+        
 except NoSuchElementException as ex:
     print ("CVS Element not found")
     print (ex)
