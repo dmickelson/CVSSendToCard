@@ -34,7 +34,7 @@ try:
     # * MAC OS Location
     # s = Service('/Users/david/projects/LinkedInProfileEval/chromedriver')
     # * WINDOWS OS Location
-    s = Service('C:\\development\SalesNavInboxAddCandidate\chromedriver.exe')
+    s = Service('C:\Program Files (x86)\Chromedriver\chromedriver.exe')
     browser = webdriver.Chrome(service=s, options=chrome_options)
     print("Connected to Chrome Web Driver Service")
 except BaseException as ex:
