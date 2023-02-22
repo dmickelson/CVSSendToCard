@@ -1,4 +1,6 @@
 import time
+import logging
+from tqdm import tqdm
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -8,9 +10,22 @@ from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
 
+
+logger = logging.getLogger("CVSSendToCard")
+logger.setLevel(logging.INFO)
+# * create console handler and set level to debug
+ch = logging.StreamHandler()
+ch.setLevel(logging.DEBUG)
+formatter = logging.Formatter(fmt="%(asctime)s: %(name)s - %(levelname)s - %(message)s", datefmt="%H:%M:%S")
+# * add formatter to ch
+ch.setFormatter(formatter)
+# * add ch to logger
+logger.addHandler(ch)  
+
+
 # * This script goes through SalesNav Inbox and adds connections to the CRM that are not already in the database
-print("Running Send To CVS Card\n")
-# CVS URL https://www.cvs.com/extracare/home
+logger.info("Running Send To CVS Card\n")
+# ? CVS URL https://www.cvs.com/extracare/home
 
 # *
 # * Start the LinkedIn Profile page scrapping
@@ -36,36 +51,36 @@ try:
     # * WINDOWS OS Location
     s = Service('C:\Program Files (x86)\Chromedriver\chromedriver.exe')
     browser = webdriver.Chrome(service=s, options=chrome_options)
-    print("Connected to Chrome Web Driver Service")
+    logger.info("Connected to Chrome Web Driver Service")
 except BaseException as ex:
-    print("*** Chrome Web Driver is unreachable, did you start the browser session?")
-    print(ex)
+    logger.exception("*** Chrome Web Driver is unreachable, did you start the browser session?")
+    logger.exception(ex)
     exit()
 
 # * Make Sure its the right CVS Page
 try:
     browser.find_element(By.XPATH,"//h1[contains(@id,'extracareHeading')]")
     # browser.find_element(By.XPATH,"//span[contains(@class,'sc-send-to-card-action')]")
-    print("Found correct CVS Page")
-    print ("Scrolling to end of page to load all Send To Card Elements")
+    logger.debug("Found correct CVS Page")
+    logger.debug ("Scrolling to end of page to load all Send To Card Elements")
     browser.execute_script("var scrollingElement = (document.scrollingElement || document.body);scrollingElement.scrollTop = scrollingElement.scrollHeight;")
     time.sleep(1)
-    print("Working on parsing Add To Cards")
-    # print("Coupons",len(browser.find_elements(By.XPATH,"//span[text()='Send to card']")))
+    logger.info("Working on finding Coupons")
+    logger.debug("Coupons found: " + str(len(browser.find_elements(By.XPATH,"//span[text()='Send to card']"))))
     # if (browser.find_element(By.XPATH,"//span[text()='Send to card']")):
     try: 
         while (browser.find_element(By.XPATH,"//span[text()='Send to card']")):   
-            print("Coupons",len(browser.find_elements(By.XPATH,"//span[text()='Send to card']")))
+            logger.info("Coupons left: " + str(len(browser.find_elements(By.XPATH,"//span[text()='Send to card']"))))
             sendToCard = browser.find_element(By.XPATH,"//span[text()='Send to card']")
             sendToCard.click()
             time.sleep(0.5) # half a second
     except NoSuchElementException as ex:
-        print ("No more send to card elements found. All Done!")
+        logger.info ("No more send to card elements found. All Done!")
         exit()
         
 except NoSuchElementException as ex:
-    print ("CVS Element not found")
-    print (ex)
+    logger.exception ("CVS Element not found")
+    logger.exception (ex)
     exit()
 
 
