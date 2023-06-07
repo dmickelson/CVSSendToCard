@@ -69,13 +69,17 @@ try:
     logger.debug("Coupons found: " + str(len(browser.find_elements(By.XPATH,"//span[text()='Send to card']"))))
     # if (browser.find_element(By.XPATH,"//span[text()='Send to card']")):
     try: 
-        while (browser.find_element(By.XPATH,"//span[text()='Send to card']")):   
-            logger.info("Coupons left: " + str(len(browser.find_elements(By.XPATH,"//span[text()='Send to card']"))))
+        while (browser.find_element(By.XPATH,"//span[text()='Send to card']")):
+            coupons_left = len(browser.find_elements(By.XPATH,"//span[text()='Send to card']"))
+            logger.info("Coupons left: " + str(coupons_left))
             # sendToCard = browser.find_element(By.XPATH,"//span[text()='Send to card']")
             # sendToCard = browser.find_element(By.XPATH,"//button[contains(@class,'sc-send-to-card-action')]")
             sendToCard = browser.find_element(By.XPATH,"//span[contains(@class,'sc-send-to-card-action')]")
             browser.execute_script("arguments[0].click();", sendToCard)
-            #sendToCard.click()
+            if coupons_left == 1:
+                # One final browse to end of page to handle dynamic loading
+                logger.debug ("Scrolling to end of page one last time")
+                browser.execute_script("var scrollingElement = (document.scrollingElement || document.body);scrollingElement.scrollTop = scrollingElement.scrollHeight;")
             time.sleep(0.5) # half a second
     except NoSuchElementException as ex:
         logger.info ("No more send to card elements found. All Done!")
