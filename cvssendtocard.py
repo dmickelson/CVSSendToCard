@@ -9,7 +9,7 @@ from selenium.common.exceptions import TimeoutException
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.common.by import By
-
+from connecttobrowser import connecttobrowser
 
 logger = logging.getLogger("CVSSendToCard")
 logger.setLevel(logging.INFO)
@@ -30,32 +30,12 @@ logger.info("Running Send To CVS Card\n")
 # *
 # * Start the CVS Page Button clicking!
 # *
-# * Start a new chrome browser session
-# ? Reuse existing browser MACOS: Google\ Chrome --remote-debugging-port=9222 --user-data-dir="~/ChromeProfile"
-# ? MACOS: To authorize new downloaded chromedriver. Open Terminal window and chromedriver location and type xattr -d com.apple.quarantine chromedriver
-# ? Windows: start chrome.exe -–remote-debugging-port=9222 --user-data-dir="C:/temp" 
-# ? Windows: Manually create the C:/temp directory
-# ? Be sure to Log Into LinkedIn first
-# ? Be sure to also add the LinkMatch extension as well to check Zoho Recruit
-
 try:
-    chrome_options = Options()
-    chrome_options.add_experimental_option("debuggerAddress", "127.0.0.1:9222")
-    # chrome_options.add_experimental_option("debuggerAddress", "localhost:9222")
-    chrome_options.add_argument('--log-level=3')
-    chrome_options.add_argument('--ignore-certificate-errors-spki-list')
-    chrome_options.add_argument('--ignore-ssl-errors')   
-    # * Specifies the path to the chromedriver.exe
-    # * MAC OS Location
-    # s = Service('/Users/david/projects/LinkedInProfileEval/chromedriver')
-    # * WINDOWS OS Location
-    s = Service('C:\Program Files (x86)\Chromedriver\chromedriver.exe')
-    browser = webdriver.Chrome(service=s, options=chrome_options)
-    logger.info("Connected to Chrome Web Driver Service")
-except BaseException as ex:
-    logger.exception("*** Chrome Web Driver is unreachable, did you start the browser session?")
+    browser = connecttobrowser.connect_to_browser()
+except Exception as ex:
+    logger.exception(f"Error Connecting To Browser")
     logger.exception(ex)
-    exit()
+    raise ex 
 
 # * Make Sure its the right CVS Page
 try:
