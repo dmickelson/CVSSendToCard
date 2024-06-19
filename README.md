@@ -1,4 +1,4 @@
-# Simple Selinium Script To Add CVS Deals To Your Card
+# Simple Selenium Python Script To Add CVS Deals To Your Card
 
 Obviously need to login to your CVS account. 
 
